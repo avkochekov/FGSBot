@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->motionGroupBox->setEnabled(false);
     connect(videoSocket, &QTcpSocket::readyRead, this, &MainWindow::readVideo);
     connect(dataSocket, &QTcpSocket::readyRead, this, &MainWindow::readData);
     connect(ui->networkConnect, &QPushButton::clicked, [=](){
@@ -22,6 +23,39 @@ MainWindow::MainWindow(QWidget *parent) :
         QString s = "INFO:";
         dataSocket->write(s.toUtf8() + ui->serialList->currentText().toUtf8());
         videoSocket->write(s.toUtf8() + ui->cameraList->currentText().toUtf8());
+    });
+    connect(ui->motionControl, &QCheckBox::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:" + QString::number(ui->motionControl->isChecked()).toUtf8());
+        }
+        ui->motionGroupBox->setEnabled(ui->motionControl->isChecked());
+    });
+
+
+    connect(ui->buttonForward, &QPushButton::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:F");
+        }
+    });
+    connect(ui->buttonBackward, &QPushButton::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:B");
+        }
+    });
+    connect(ui->buttonLeft, &QPushButton::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:L");
+        }
+    });
+    connect(ui->buttonRight, &QPushButton::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:R");
+        }
+    });
+    connect(ui->buttonStop, &QPushButton::clicked, [=](){
+        if(dataSocket->isWritable()){
+            dataSocket->write("MC:S");
+        }
     });
 }
 

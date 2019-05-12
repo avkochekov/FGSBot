@@ -8,7 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    qDebug() << "[123]";
     connect(videoServer, &QTcpServer::newConnection, [=](){
+        qDebug() << "[VIDEO SERVER CONNECTED]";
         videoSocket = videoServer->nextPendingConnection();
         connect(this, &MainWindow::videoDataAvailable, [=](QByteArray data){
             if (videoSocket->isWritable())
@@ -20,18 +22,29 @@ MainWindow::MainWindow(QWidget *parent) :
                 this->initVideo(data.last());
         });
         sendData(videoSocket,this->getVideoInfo().toUtf8());
+        connect(videoSocket, &QTcpSocket::disconnected, [=](){
+            cameras.clear();
+//            camera->stop();
+        });
     });
 
     connect(dataServer, &QTcpServer::newConnection, [=](){
+        qDebug() << "[DATA SERVER CONNECTED]";
         dataSocket = dataServer->nextPendingConnection();
         connect(this, &MainWindow::serailDataAvailable, [=](QByteArray data){
-            if (dataSocket->isWritable())
+            if (dataSocket->isWritable()){
+                qDebug() << "[NEW SERIAL DATA]: " << QString(data);
                 sendData(dataSocket,data);
+            }
         });
         connect(dataSocket, &QTcpSocket::readyRead, [=](){
             QStringList data = QString(dataSocket->readAll()).split(":");
-            if (data.first() == "INFO" && !data.last().isEmpty())
+            qDebug() << "[READ DATA]: " << data.first() << "\t" << data.last();
+            if (data.first() == "INFO" && !data.last().isEmpty()){
                 this->initSerial("/dev/"+data.last());
+            } else if (data.first() == "MC" && !data.last().isEmpty()){
+                serial->write(data.last().toUtf8());
+            }
         });
         sendData(dataSocket,this->getSerialInfo().toUtf8());
     });
@@ -57,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::initSerial(QString name)
 {
+//    serial->close();
+//    serial->clear();
     serial = new QSerialPort(this);
     serial->setPortName(name);
     serial->setBaudRate(9600);
@@ -83,13 +98,19 @@ void MainWindow::initSerial(QString name)
         emit serailDataAvailable(s.toUtf8());
         qDebug() << "SENDING DATA: " + s;
     });
-    emit serailDataAvailable(QString("40;30;20;10").toUtf8());
+    emit serailDataAvailable(QString("-----;-----;-----;-----").toUtf8());
 }
 
 void MainWindow::initVideo(QString name)
 {
-    if (!cameras.size())
+//    camera->stop();
+//    camera->disconnect();
+    imageCapture = new QCameraImageCapture(nullptr);
+
+    if (!cameras.size()){
+        qDebug() << "[NO CAMERAS]";
         return;
+    }
     foreach (QCameraInfo c, cameras) {
         if (c.deviceName() == name)
             camera = new QCamera(c);
@@ -120,7 +141,11 @@ void MainWindow::initVideo(QString name)
 void MainWindow::sendData(QTcpSocket *socket, QByteArray data)
 {
     if(socket->isWritable()) {
-        qDebug() << "[SEND] " << socket << data << endl;
+        qDebug() << "[SEND] " << socket;
+        if (socket == dataSocket)
+            qDebug() << data;
+        qDebug() << endl;
+
         QByteArray block;
         QDataStream m_outcomingMessage(&block, QIODevice::WriteOnly);
         m_outcomingMessage.setVersion(QDataStream::Qt_5_9);
@@ -159,5 +184,3 @@ QString MainWindow::getVideoInfo()
     s.prepend("INFO:");
     return s;
 }
-
-

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1061</width>
-    <height>708</height>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -320,7 +320,10 @@
      </widget>
     </item>
     <item row="4" column="1">
-     <widget class="QGroupBox" name="groupBox_3">
+     <widget class="QGroupBox" name="motionGroupBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -346,7 +349,7 @@
        <item row="3" column="1">
         <widget class="QPushButton" name="buttonLeft">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -381,7 +384,7 @@
        <item row="4" column="2">
         <widget class="QPushButton" name="buttonBackward">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -416,7 +419,7 @@
        <item row="3" column="3">
         <widget class="QPushButton" name="buttonRight">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
@@ -451,7 +454,7 @@
        <item row="3" column="2">
         <widget class="QPushButton" name="buttonStop">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -486,7 +489,7 @@
        <item row="2" column="2">
         <widget class="QPushButton" name="buttonForward">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -624,7 +627,7 @@
         </widget>
        </item>
        <item row="3" column="0" colspan="2">
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="motionControl">
          <property name="text">
           <string>Управление движением</string>
          </property>
